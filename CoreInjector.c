@@ -46,6 +46,17 @@ efi_main(IN EFI_HANDLE ImageHandle, IN EFI_SYSTEM_TABLE *SystemTable) {
 		8. After mapping unload the driver and call windows bootloader.
 		
 		*/
+		
+		
+		__asm__ volatile (
+    "movq $0x2000, %%rdi\n"  // Adresse til skrivning (ændr til din ønskede adresse)
+    "movl $0xCD19, %%eax\n"       // Værdi der skal skrives (ændr til din ønskede værdi)
+    "movl %%eax, (%%rdi)\n"       // Skriv værdien til den angivne adresse
+    :
+    :
+    : "eax", "rdi"
+);
+
 
     // Send IPI to the target processor.
     UINT32 StartAddress = 0x2000; // Start address for the 6th processor.  // Angiv den ønskede processor-ID (6)

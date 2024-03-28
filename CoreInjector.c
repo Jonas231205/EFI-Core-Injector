@@ -47,21 +47,25 @@ efi_main(IN EFI_HANDLE ImageHandle, IN EFI_SYSTEM_TABLE *SystemTable) {
 		
 		*/
 
-    // Send IPI to the target processor
-    UINT32 StartAddress = 0x2000; // Start address for the 6th processor
-    UINT32 IpiCommand = 0x000C4600 + StartAddress; // Indicates the start address
+    // Send IPI to the target processor.
+    UINT32 StartAddress = 0x2000; // Start address for the 6th processor.  // Angiv den ønskede processor-ID (6)
+UINT8 ProcessorId = 6;
 
-    // Send IPI using inline assembly
-    __asm__ volatile (
-        "movq $0xFEE00300, %%rsi\n"  // Load address of ICR into RSI
-        "movl %0, %%eax\n"            // Load IPI command into EAX
-        "movl %%eax, (%%rsi)\n"       // Send IPI command
-        :
-        : "r" (IpiCommand)
-        : "eax", "esi"
-    );
+// Use the variables to define Processor config.
+UINT32 IpiCommand = (ProcessorId << 24) | 0x4600 + (StartAddress >> 12);
 
-    // Introduce a delay of 100 milliseconds (adjust as needed)
+// Send IPI
+__asm__ volatile (
+    "movq $0xFEE00300, %%rsi\n"      // Loading address for ICR i RSI
+    "movl %0, %%eax\n"                // Loading IPI-Commando in EAX
+    "movl %%eax, (%%rsi)\n"           // Send IPI-Commando
+    :
+    : "r" (IpiCommand)
+    : "eax", "esi"
+);
+
+
+    // Introduce a delay of 1000 milliseconds (adjust as needed)
     delay(100000);
 
     // Print "Hello, World!"
